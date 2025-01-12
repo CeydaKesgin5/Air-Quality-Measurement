@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:13
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: map_marking_db2
+    networks:
+      - backend-network
+    ports:
+      - "7076:5432"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend_container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/map_marking_db2
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - db
+    ports:
+      - "7074:8080"
+    networks:
+      - backend-network
+
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "7072:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    environment:
+      - INFLUXDB_DB=sensor_data_db
+      - INFLUXDB_ADMIN_USER=ceyda
+      - INFLUXDB_ADMIN_PASSWORD=12345678
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "7070:3000"
+    volumes:
+      - frontend_data:/app/data
+    networks:
+      - backend-network
+
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  frontend_data:
+

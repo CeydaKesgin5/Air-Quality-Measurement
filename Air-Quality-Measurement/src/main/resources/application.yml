@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/map_marking_db2
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  influxdb:
+    url: http://localhost:8086
+    username: Ceyda
+    password: 12345678
+    database: sensor_data_db
+
+  liquibase:
+    change-log: classpath:db/changelog-master.xml
+    enabled: true
